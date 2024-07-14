@@ -102,7 +102,7 @@ vim.g.have_nerd_font = false
 vim.opt.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.opt.relativenumber = true
+vim.opt.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
@@ -142,7 +142,7 @@ vim.opt.splitbelow = true
 -- Sets how neovim will display certain whitespace characters in the editor.
 --  See `:help 'list'`
 --  and `:help 'listchars'`
-vim.opt.list = true
+vim.opt.list = false
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
 -- Preview substitutions live, as you type!
@@ -153,6 +153,8 @@ vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
+
+vim.opt.tabstop = 4
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -622,6 +624,16 @@ require('lazy').setup({
           end,
         },
       }
+      -- Can't add 'gdscript' to servers because it is not listed in Mason. So :MasonInstall gdscript won't work
+      local gdscript_config = {
+        capabilities = capabilities,
+        settings = {},
+      }
+      if vim.fn.has 'win32' == 1 then
+        -- Windows specific. Requires nmap installed (`winget install nmap`)
+        gdscript_config['cmd'] = { 'ncat', 'localhost', os.getenv 'GDScript_Port' or '6005' }
+      end
+      require('lspconfig').gdscript.setup(gdscript_config)
     end,
   },
 
@@ -835,9 +847,9 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc' },
+      ensure_installed = { 'bash', 'c', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'gdscript', 'godot_resource' },
       -- Autoinstall languages that are not installed
-      auto_install = true,
+      auto_install = false,
       highlight = {
         enable = true,
         -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
@@ -864,6 +876,9 @@ require('lazy').setup({
     end,
   },
 
+  { 'habamax/vim-godot', event = 'VimEnter' },
+  { 'rose-pine/neovim', name = 'rose-pine' },
+  -- { 'ellisonleao/gruvbox.nvim', priority = 1000, config = true, opts = ... },
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
@@ -873,7 +888,7 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the Kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-  -- require 'kickstart.plugins.debug',
+  require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
   -- require 'kickstart.plugins.autopairs',
@@ -910,3 +925,88 @@ require('lazy').setup({
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+
+-- Enable neovim to be the external editor for Godot, if the cwd has a project.godot file
+if vim.fn.filereadable(vim.fn.getcwd() .. '/project.godot') == 1 then
+  local addr = './godot.pipe'
+  if vim.fn.has 'win32' == 1 then
+    -- Windows can't pipe so use localhost. Make sure this is configured in Godot
+    -- Exec Path: nvim
+    -- Exec Flags: --server 127.0.0.1:6004 --remote-send "<esc>:n {file}<CR>:call cursor({line},{col})<CR>"
+    addr = '127.0.0.1:6004'
+  end
+  vim.fn.serverstart(addr)
+end
+
+-- Theme
+require('rose-pine').setup {
+  variant = 'auto', -- auto, main, moon, or dawn
+  dark_variant = 'main', -- main, moon, or dawn
+  dim_inactive_windows = false,
+  extend_background_behind_borders = true,
+
+  enable = {
+    terminal = true,
+    legacy_highlights = true, -- Improve compatibility for previous versions of Neovim
+    migrations = true, -- Handle deprecated options automatically
+  },
+
+  styles = {
+    bold = true,
+    italic = true,
+    transparency = false,
+  },
+
+  groups = {
+    border = 'muted',
+    link = 'iris',
+    panel = 'surface',
+
+    error = 'love',
+    hint = 'iris',
+    info = 'foam',
+    note = 'pine',
+    todo = 'rose',
+    warn = 'gold',
+
+    git_add = 'foam',
+    git_change = 'rose',
+    git_delete = 'love',
+    git_dirty = 'rose',
+    git_ignore = 'muted',
+    git_merge = 'iris',
+    git_rename = 'pine',
+    git_stage = 'iris',
+    git_text = 'rose',
+    git_untracked = 'subtle',
+
+    h1 = 'iris',
+    h2 = 'foam',
+    h3 = 'rose',
+    h4 = 'gold',
+    h5 = 'pine',
+    h6 = 'foam',
+  },
+
+  highlight_groups = {
+    -- Comment = { fg = "foam" },
+    -- VertSplit = { fg = "muted", bg = "muted" },
+  },
+
+  before_highlight = function(group, highlight, palette)
+    -- Disable all undercurls
+    -- if highlight.undercurl then
+    --     highlight.undercurl = false
+    -- end
+    --
+    -- Change palette colour
+    -- if highlight.fg == palette.pine then
+    --     highlight.fg = palette.foam
+    -- end
+  end,
+}
+
+-- vim.cmd 'colorscheme rose-pine'
+-- vim.cmd("colorscheme rose-pine-main")
+vim.cmd 'colorscheme rose-pine-moon'
+-- vim.cmd("colorscheme rose-pine-dawn")
