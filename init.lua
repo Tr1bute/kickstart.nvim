@@ -709,6 +709,7 @@ require('lazy').setup({
       --  into multiple repos for maintenance purposes.
       'hrsh7th/cmp-nvim-lsp',
       'hrsh7th/cmp-path',
+      { 'VonHeikemen/lsp-zero.nvim', branch = 'v3.x' },
     },
     config = function()
       -- See `:help cmp`
@@ -753,7 +754,7 @@ require('lazy').setup({
           -- Manually trigger a completion from nvim-cmp.
           --  Generally you don't need this, because nvim-cmp will display
           --  completions whenever it has completion options available.
-          ['<C-space>'] = cmp.mapping.complete {},
+          ['<C-x>'] = cmp.mapping.complete {},
 
           -- Think of <c-l> as moving to the right of your snippet expansion.
           --  So if you have a snippet that's like:
@@ -778,6 +779,7 @@ require('lazy').setup({
           --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
         },
         sources = {
+          { name = 'lsp-zero' },
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
