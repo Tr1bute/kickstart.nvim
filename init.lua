@@ -142,7 +142,7 @@ vim.opt.splitbelow = true
 -- Sets how neovim will display certain whitespace characters in the editor.
 --  See `:help 'list'`
 --  and `:help 'listchars'`
-vim.opt.list = false
+vim.opt.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
 -- Preview substitutions live, as you type!
@@ -155,6 +155,7 @@ vim.opt.cursorline = true
 vim.opt.scrolloff = 10
 
 vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -238,8 +239,7 @@ vim.opt.rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-  'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
-
+  -- 'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
   'preservim/nerdtree',
   'ThePrimeagen/harpoon',
   -- NOTE: Plugins can also be added by using a table,
@@ -367,11 +367,17 @@ require('lazy').setup({
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
         --
-        -- defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
-        -- },
+        defaults = {
+          file_ignore_patterns = {
+            '%.png',
+            '%.gif',
+            '%.ase',
+            '%.aseprite',
+          },
+          -- mappings = {
+          --   i = { ['<c-enter>'] = 'to_fuzzy_refine' },
+          -- },
+        },
         -- pickers = {}
         extensions = {
           ['ui-select'] = {
@@ -874,7 +880,7 @@ require('lazy').setup({
       indent = { enable = true, disable = { 'ruby' } },
     },
     config = function(_, opts)
-      -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
+      -- [[ Configure Treesitter ]] See `:help nvimtreesitter`
 
       -- Prefer git instead of curl in order to improve connectivity in some environments
       require('nvim-treesitter.install').prefer_git = true
@@ -890,7 +896,6 @@ require('lazy').setup({
     end,
   },
 
-  { 'habamax/vim-godot', event = 'VimEnter' },
   { 'rose-pine/neovim', name = 'rose-pine' },
   -- { 'ellisonleao/gruvbox.nvim', priority = 1000, config = true, opts = ... },
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
@@ -914,7 +919,7 @@ require('lazy').setup({
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
