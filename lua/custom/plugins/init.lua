@@ -4,4 +4,5 @@
 -- See the kickstart.nvim README for more information
 return {
   { 'akinsho/toggleterm.nvim', version = '*', opts = { open_mapping = [[<c-\>]] } },
+  'Civitasv/cmake-tools.nvim',
 }
